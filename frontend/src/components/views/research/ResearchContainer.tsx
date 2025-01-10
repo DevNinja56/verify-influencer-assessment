@@ -98,25 +98,31 @@ const ResearchContainer = () => {
         toast.success(response?.data?.message);
         navigate(ROUTES.DETAIL.replace(":id", response.data?.data?.id));
       }
-    } catch (error: any) {
-      toast.error(error.message);
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("An unexpected error occurred.");
+      }
     } finally {
       setLoading(false);
     }
   };
 
   const filterInfluencerName = (inputValue: string) => {
-    return influencerNames
-      ?.filter((i) => i?.toLowerCase()?.includes(inputValue.toLowerCase()))
-      .map((name) => ({
-        label: name,
-        value: name,
-      }));
+    return influencerNames.length > 0
+      ? influencerNames
+          ?.filter((i) => i?.toLowerCase()?.includes(inputValue.toLowerCase()))
+          .map((name) => ({
+            label: name,
+            value: name,
+          }))
+      : [];
   };
 
   const loadOptions = (
     inputValue: string,
-    callback: (options: any[]) => void
+    callback: (options: { label: string; value: string }[]) => void
   ) => {
     setTimeout(() => {
       callback(filterInfluencerName(inputValue));
