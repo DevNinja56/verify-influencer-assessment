@@ -28,7 +28,6 @@ services:
       - app-network
     depends_on:
       - mongo
-      - redis
 
   mongo:
     image: mongo:latest
