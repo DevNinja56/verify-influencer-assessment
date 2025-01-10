@@ -1,0 +1,72 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  BRANCH: ${{ github.sha }}
+  APP_NAME: "verify-influencer"
+  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  EC2_HOST: ${{ secrets.EC2_HOST }}
+  EC2_USER: ${{ secrets.EC2_USER }}
+  EC2_KEY: ${{ secrets.EC2_KEY }}
+
+jobs:
+  build-and-deploy:
+    name: Build and Deploy
+
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials from OIDC
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-to-assume: "arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-action-deployment-role"
+          role-session-name: "GitHubActionsSession"
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ env.EC2_KEY }}" | base64 -d > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Deploy Application
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ env.EC2_USER }}@${{ env.EC2_HOST }} << 'EOF'
+            set -e
+            echo "Starting deployment process..."
+
+            # Pull the latest code
+            cd /home/ubuntu/app
+            git pull origin main --no-ff
+
+            # Fetch the latest secrets
+            echo "Fetching the latest secrets..."
+            BACKEND_SECRET_JSON=$(aws secretsmanager get-secret-value --secret-id ${{ env.APP_NAME }}/backend --query 'SecretString' --output text)
+            FRONTEND_SECRET_JSON=$(aws secretsmanager get-secret-value --secret-id ${{ env.APP_NAME }}/frontend --query 'SecretString' --output text)
+
+            # Update the .env files
+            echo "$BACKEND_SECRET_JSON" | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' > backend/.env
+            echo "$FRONTEND_SECRET_JSON" | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' > frontend/.env
+
+            # Build the backend and frontend images
+            echo "Building backend image..."
+            docker compose build --no-cache
+            docker compose up -d
+
+            # Reload Nginx
+            echo "Reloading Nginx..."
+            sudo systemctl reload nginx
+
+            echo "Deployment completed successfully!"
+          EOF
