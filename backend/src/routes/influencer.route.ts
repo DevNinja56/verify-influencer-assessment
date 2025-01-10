@@ -1,6 +1,5 @@
 import express from "express"
 import InfluencerController from "../controllers/influencer.controller"
-import { authenticate } from "../middlewares/auth.middleware"
 
 const router = express.Router()
 
