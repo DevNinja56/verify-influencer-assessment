@@ -30,7 +30,8 @@ const ResearchContainer = () => {
     React.useState(false);
   const [journals, setJournals] = React.useState<string[]>([]);
   const [selectedJournals, setSelectedJournals] = React.useState<string[]>([]);
-  const [influencerNames, setInfluencerNames] = React.useState<string[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_, setInfluencerNames] = React.useState<string[]>([]);
 
   const [payload, setPayload] = useState({
     name: "",
@@ -110,26 +111,6 @@ const ResearchContainer = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const filterInfluencerName = (inputValue: string) => {
-    return influencerNames.length > 0
-      ? influencerNames
-          ?.filter((i) => i?.toLowerCase()?.includes(inputValue.toLowerCase()))
-          .map((name) => ({
-            label: name,
-            value: name,
-          }))
-      : [];
-  };
-
-  const loadOptions = (
-    inputValue: string,
-    callback: (options: { label: string; value: string }[]) => void
-  ) => {
-    setTimeout(() => {
-      callback(filterInfluencerName(inputValue));
-    }, 1000);
   };
 
   return (
