@@ -19,6 +19,10 @@ const config = {
   OPEN_AI: {
     NAMESPACE: "OpenAI",
     API_KEY: process.env.OPEN_AI_API_KEY || ""
+  },
+  SERP_API: {
+    NAMESPACE: "SerpApi",
+    API_KEY: process.env.SERP_API_KEY || ""
   }
 }
 

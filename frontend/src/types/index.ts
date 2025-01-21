@@ -3,19 +3,13 @@ export type CLAIMS_TYPE = {
   category: string;
   verificationStatus: string;
   confidenceScore: number;
+  source: string;
   _id: string;
   createdAt: string;
 };
 
-export type CLAIM_STATS = {
-  totalClaims: number;
-  verifiedClaims: number;
-  questionableClaims: number;
-  debunkedClaims: number;
-};
-
 export type INFLUENCER_TYPE = {
-  claimStats: CLAIM_STATS;
+  claimStats: number;
   debunkedClaims: number;
   questionableClaims: number;
   totalClaims: number;
@@ -31,7 +25,8 @@ export type INFLUENCER_TYPE = {
 };
 
 export type INFLUENCER_DETAIL = {
-  claimStats: CLAIMS_TYPE[];
+  claimStats: number;
+  claims: CLAIMS_TYPE[];
   createdAt: string;
   followerCount: number;
   followersCount: number;
@@ -40,6 +35,8 @@ export type INFLUENCER_DETAIL = {
   platform: string;
   trustScore: number;
   updatedAt: string;
+  yearlyRevenue: number;
+  products: number;
   __v: number;
   _id: string;
 };

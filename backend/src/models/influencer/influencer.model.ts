@@ -4,17 +4,14 @@ import { IInfluencer } from "./influencer.document"
 // Define the schema for the Influencer model
 const InfluencerSchema: Schema = new Schema(
   {
-    name: { type: String, required: true },
+    name: { type: String, required: true, unique: true },
     platform: { type: String, required: true },
-    handle: { type: String, required: true },
-    followerCount: { type: Number, required: true },
-    trustScore: { type: Number, default: 0 },
-    claimStats: {
-      totalClaims: { type: Number, default: 0 },
-      verifiedClaims: { type: Number, default: 0 },
-      questionableClaims: { type: Number, default: 0 },
-      debunkedClaims: { type: Number, default: 0 }
-    }
+    handle: { type: String, required: false },
+    followerCount: { type: Number, required: false, default: 0 },
+    yearlyRevenue: { type: Number, required: false, default: 0 },
+    products: { type: Number, required: false, default: 0 },
+    trustScore: { type: Number, required: false, default: 0 },
+    influencerCategory: { type: String, required: false }
   },
   {
     timestamps: true

@@ -1,0 +1,137 @@
+{
+  "influencer": "Dr. Mike Varshavski",
+  "influencerCategory": "Medical",
+  "timeRange": "allTime",
+  "summary": "Dr. Mike Varshavski is a board-certified family medicine physician who uses his social media platforms to educate the public about health and wellness. He is known for debunking medical misinformation and advocating for preventive care.",
+  "followers": {
+    "total": 25000000,
+    "platforms": { "youtube": 6000000, "instagram": 4000000, "tiktok": 15000000, "twitter": 1000000, "other": 0 },
+    "lastUpdated": "2022-01-01"
+  },
+  "yearlyRevenue": {
+    "total": 1000000,
+    "breakdown": { "youtube": 500000, "sponsorships": 300000, "products": 200000, "other": 0 },
+    "lastUpdated": "2022-01-01"
+  },
+  "recommendedProducts": [],
+  "revenueAnalysis": {
+    "mainRevenueSources": ["youtube", "sponsorships", "products"],
+    "estimatedRevenue": {
+      "total": 1000000,
+      "breakdown": { "youtube": 500000, "sponsorships": 300000, "products": 200000, "other": 0 }
+    },
+    "businessRelationships": ["Aflac Wellness Matters campaign"],
+    "potentialConflicts": [],
+    "impactOnCredibility": "Dr. Mike's credibility is generally high due to his medical background and his commitment to debunking medical misinformation. His business relationship with Aflac does not appear to impact his credibility negatively."
+  },
+  "claims": [
+    {
+      "content": "Vitamin C reduces smoking risk",
+      "category": "Nutrition",
+      "verificationStatus": "Debunked",
+      "trustScore": 20,
+      "source": { "name": "MedPage Today", "url": "https://www.medpagetoday.com/popmedicine/dr-mike/108231" },
+      "evidenceBreakdown": { "scientificEvidence": 8, "sourceCredibility": 6, "expertConsensus": 6 }
+    },
+    {
+      "content": "Leaky gut is a major health issue",
+      "category": "Gastroenterology",
+      "verificationStatus": "Questionable",
+      "trustScore": 50,
+      "source": { "name": "MedPage Today", "url": "https://www.medpagetoday.com/popmedicine/dr-mike/108231" },
+      "evidenceBreakdown": { "scientificEvidence": 20, "sourceCredibility": 15, "expertConsensus": 15 }
+    },
+    {
+      "content": "Social media can be used to combat medical misinformation",
+      "category": "Medical Information",
+      "verificationStatus": "Verified",
+      "trustScore": 90,
+      "source": { "name": "YouTube", "url": "https://www.youtube.com/watch?v=lO9buNSA5jA" },
+      "evidenceBreakdown": { "scientificEvidence": 36, "sourceCredibility": 27, "expertConsensus": 27 }
+    },
+    {
+      "content": "Young people often make common health mistakes",
+      "category": "General Health",
+      "verificationStatus": "Verified",
+      "trustScore": 80,
+      "source": {
+        "name": "Aflac Newsroom",
+        "url": "https://newsroom.aflac.com/2024-08-12-Health-care-advocate-and-YouTube-star-Doctor-Mike-Varshavski-joins-Aflac-on-their-Wellness-Matters-campaign,-urging-young-people-to-develop-better-health-habits"
+      },
+      "evidenceBreakdown": { "scientificEvidence": 32, "sourceCredibility": 24, "expertConsensus": 24 }
+    },
+    {
+      "content": "Preventive care is important",
+      "category": "Preventive Medicine",
+      "verificationStatus": "Verified",
+      "trustScore": 100,
+      "source": {
+        "name": "Atlantic Health",
+        "url": "https://www.atlantichealth.org/find-a-doctor/mikhail-varshavski-1548680986"
+      },
+      "evidenceBreakdown": { "scientificEvidence": 40, "sourceCredibility": 30, "expertConsensus": 30 }
+    },
+    {
+      "content": "Sleeping consistently each night, exercising, managing stress, and eating a balanced diet still remain the cornerstones of aging well",
+      "category": "Health",
+      "verificationStatus": "Verified",
+      "trustScore": 90,
+      "source": {
+        "name": "Fortune",
+        "url": "https://fortune.com/well/2023/10/21/tiktoks-doctor-mike-over-optimizing-health-living-longer/"
+      },
+      "evidenceBreakdown": { "scientificEvidence": 36, "sourceCredibility": 27, "expertConsensus": 27 }
+    },
+    {
+      "content": "When it comes to weight, don't underestimate the role of your mental health",
+      "category": "Health",
+      "verificationStatus": "Verified",
+      "trustScore": 85,
+      "source": {
+        "name": "WKOW",
+        "url": "https://www.wkow.com/news/health/lose-weight-quick-online-schemes-don-t-work-dr-mike-offers-these-5-tips-instead/article_9c539c17-aad6-5c8d-bdf4-86c9e1da1c0f.html"
+      },
+      "evidenceBreakdown": { "scientificEvidence": 34, "sourceCredibility": 26, "expertConsensus": 26 }
+    },
+    {
+      "content": "40 facts about your body that have been verified with reputable scientific sources",
+      "category": "Health",
+      "verificationStatus": "Verified",
+      "trustScore": 95,
+      "source": { "name": "YouTube", "url": "https://www.youtube.com/watch?v=KPh-qbnWoBA" },
+      "evidenceBreakdown": { "scientificEvidence": 38, "sourceCredibility": 29, "expertConsensus": 29 }
+    },
+    {
+      "content": "50 random facts about me",
+      "category": "Personal",
+      "verificationStatus": "Verified",
+      "trustScore": 100,
+      "source": { "name": "YouTube", "url": "https://www.youtube.com/watch?v=Ub3Xii_jJ-8" },
+      "evidenceBreakdown": { "scientificEvidence": 40, "sourceCredibility": 30, "expertConsensus": 30 }
+    },
+    {
+      "content": "Doctor Fact-Checks Grandma's Medical Advice",
+      "category": "Health",
+      "verificationStatus": "Verified",
+      "trustScore": 80,
+      "source": { "name": "YouTube", "url": "https://www.youtube.com/watch?v=rmx6kXSkujo" },
+      "evidenceBreakdown": { "scientificEvidence": 32, "sourceCredibility": 24, "expertConsensus": 24 }
+    },
+    {
+      "content": "Shortening the wait to see a doctor is an absolute must. That starts with getting more residency spots to train new doctors.",
+      "category": "Healthcare System",
+      "verificationStatus": "Verified",
+      "trustScore": 80,
+      "source": { "name": "Instagram", "url": "https://www.instagram.com/doctor.mike/p/CRBvqOuFGu1/" },
+      "evidenceBreakdown": { "scientificEvidence": 32, "sourceCredibility": 24, "expertConsensus": 24 }
+    },
+    {
+      "content": "I always encourage patients ask their doctor why they're starting or why they're on a medication and if there are lifestyle factors that could ...",
+      "category": "Patient Education",
+      "verificationStatus": "Verified",
+      "trustScore": 85,
+      "source": { "name": "Instagram", "url": "https://www.instagram.com/doctor.mike/reel/C-lL1Z-RtDY/" },
+      "evidenceBreakdown": { "scientificEvidence": 34, "sourceCredibility": 26, "expertConsensus": 26 }
+    }
+  ]
+}

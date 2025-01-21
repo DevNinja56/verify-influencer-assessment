@@ -5,6 +5,7 @@ import LanguageOutlinedIcon from "@mui/icons-material/LanguageOutlined";
 import { CLAIMS_TYPE } from "../../../types";
 import { VERIFICATION_STATUS } from "../../../enums/enums";
 import moment from "moment";
+import { Link } from "react-router-dom";
 
 interface propTypes {
   item: CLAIMS_TYPE;
@@ -56,14 +57,14 @@ const FilterCard = ({ item, index, length }: propTypes) => {
             gap={1}
             className="cursor-pointer"
           >
-            <Typography
+            <Link
+              to={item?.source || ""}
+              target="__blank"
               className="text-primary"
-              variant="body2"
-              fontWeight={600}
             >
               View Source
-            </Typography>
-            <OpenInNewOutlinedIcon className="text-primary !text-base" />
+              <OpenInNewOutlinedIcon className="text-primary !text-base ml-[5px]" />
+            </Link>
           </Stack>
         </Stack>
         <Stack gap={1} alignItems="end">
