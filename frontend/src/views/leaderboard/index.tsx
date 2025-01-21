@@ -1,13 +1,4 @@
-import {
-  Button,
-  Container,
-  Grid,
-  IconButton,
-  Menu,
-  MenuItem,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { Button, Container, Grid, Stack, Typography } from "@mui/material";
 import LeaderboardCard from "../../components/common/card";
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import CheckCircleOutlineOutlinedIcon from "@mui/icons-material/CheckCircleOutlineOutlined";
@@ -18,7 +9,6 @@ import TrendingDownIcon from "@mui/icons-material/TrendingDown";
 import AddIcon from "@mui/icons-material/Add";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../../config";
-import { GridMoreVertIcon } from "@mui/x-data-grid";
 import React, { useState } from "react";
 import api from "../../service";
 import { ANALYTICS_TYPE, INFLUENCER_TYPE } from "../../types";
@@ -28,10 +18,6 @@ import { formatNumber } from "../../utils/formatNumber";
 const Leaderboard = () => {
   const navigate = useNavigate();
 
-  const [openDropdown, setOpenDropdown] = React.useState<null | HTMLElement>(
-    null
-  );
-  const open = Boolean(openDropdown);
   const [allInfluencer, setAllInfluencer] = React.useState<INFLUENCER_TYPE[]>();
   const [analytics, setAnalytics] = React.useState<ANALYTICS_TYPE>();
   const [loading, setLoading] = useState<boolean>(false);
@@ -113,14 +99,14 @@ const Leaderboard = () => {
       ),
     },
     {
-      field: "category",
+      field: "influencerCategory",
       headerName: "CATEGORY",
-      renderCell: () => (
+      renderCell: (params: { value: number }) => (
         <Typography
           variant="body2"
           className="text-white h-full flex items-center capitalize"
         >
-          Medicine
+          {params.value}
         </Typography>
       ),
     },
@@ -171,7 +157,7 @@ const Leaderboard = () => {
       ),
     },
     {
-      field: "claimStats",
+      field: "verifiedClaims",
       headerName: "VERIFIED CLAIMS",
       renderCell: (params: { value: number }) => (
         <Typography
@@ -180,59 +166,6 @@ const Leaderboard = () => {
         >
           {params?.value}
         </Typography>
-      ),
-    },
-    {
-      field: "id",
-      headerName: "Options",
-      renderCell: (param: { value: string }) => (
-        <>
-          <IconButton
-            aria-label="more"
-            id="long-button"
-            aria-controls={open ? "long-menu" : undefined}
-            aria-expanded={open ? "true" : undefined}
-            aria-haspopup="true"
-            onClick={(event) => setOpenDropdown(event.currentTarget)}
-          >
-            <GridMoreVertIcon className="text-white" />
-          </IconButton>
-          <Menu
-            sx={{
-              "& .css-1tktgsa-MuiPaper-root-MuiPopover-paper-MuiMenu-paper": {
-                backgroundColor: "#101827",
-              },
-            }}
-            id="long-menu"
-            MenuListProps={{
-              "aria-labelledby": "long-button",
-            }}
-            anchorEl={openDropdown}
-            open={open}
-            onClose={() => setOpenDropdown(null)}
-            slotProps={{
-              paper: {
-                style: {
-                  width: "20ch",
-                },
-              },
-            }}
-          >
-            <MenuItem
-              className="!text-grayColor"
-              key="detail"
-              onClick={() => {
-                navigate({
-                  pathname: ROUTES.DETAIL,
-                  search: param?.value.toString(),
-                });
-                setOpenDropdown(null);
-              }}
-            >
-              Detail
-            </MenuItem>
-          </Menu>
-        </>
       ),
     },
   ];

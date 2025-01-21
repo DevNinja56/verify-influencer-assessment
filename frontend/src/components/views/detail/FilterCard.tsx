@@ -1,7 +1,7 @@
 import { Chip, Divider, Stack, Typography } from "@mui/material";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import OpenInNewOutlinedIcon from "@mui/icons-material/OpenInNewOutlined";
-import LanguageOutlinedIcon from "@mui/icons-material/LanguageOutlined";
+// import LanguageOutlinedIcon from "@mui/icons-material/LanguageOutlined";
 import { CLAIMS_TYPE } from "../../../types";
 import { VERIFICATION_STATUS } from "../../../enums/enums";
 import moment from "moment";
@@ -86,7 +86,7 @@ const FilterCard = ({ item, index, length }: propTypes) => {
           </Typography>
         </Stack>
       </Stack>
-      <Stack gap={1.5}>
+      {/* <Stack gap={1.5}>
         <Stack flexDirection="row" alignItems="center" gap={1}>
           <LanguageOutlinedIcon className="text-primary !text-base" />
           <Typography className="text-white" variant="body2" fontWeight={600}>
@@ -108,7 +108,7 @@ const FilterCard = ({ item, index, length }: propTypes) => {
           </Typography>
           <OpenInNewOutlinedIcon className="text-primary !text-base" />
         </Stack>
-      </Stack>
+      </Stack> */}
       {index !== length && <Divider className="!border-2 !border-gray-700" />}
     </Stack>
   );

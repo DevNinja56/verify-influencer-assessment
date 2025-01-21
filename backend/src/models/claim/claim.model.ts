@@ -1,14 +1,5 @@
 import mongoose, { Schema } from "mongoose"
-import { IClaim, VerificationStatus } from "./claim.document"
-
-// {
-//   "content": "Dr. Mike debunked Dr. Gundry's claims on vitamin C and smoking risk, leaky gut, and more.",
-//   "category": "Health",
-//   "verificationStatus": "Verified",
-//   "trustScore": 90,
-//   "source": { "name": "MedPage Today", "url": "https://www.medpagetoday.com/popmedicine/dr-mike/108231" },
-//   "evidenceBreakdown": { "scientificEvidence": 36, "sourceCredibility": 27, "expertConsensus": 27 }
-// },
+import { IClaim } from "./claim.document"
 
 const platformSchema = new Schema({
   youtube: { type: Number, required: false },

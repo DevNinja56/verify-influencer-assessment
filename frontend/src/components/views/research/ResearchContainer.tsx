@@ -8,7 +8,7 @@ import {
   Typography,
 } from "@mui/material";
 import ResearchCard from "./ResearchCard";
-import CustomInput from "../../common/input";
+import CustomInput from "../../../components/common/input";
 import TimeRangeCard from "./TimeRangeCard";
 import ResearchCheckbox from "./ResearchCheckbox";
 import AddIcon from "@mui/icons-material/Add";
@@ -17,7 +17,7 @@ import toast from "react-hot-toast";
 import api from "../../../service";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../../../config";
-import FullScreenLoader from "../../common/fullScreenLoader";
+import FullScreenLoader from "../../../components/common/fullScreenLoader";
 
 const ResearchContainer = () => {
   const navigate = useNavigate();

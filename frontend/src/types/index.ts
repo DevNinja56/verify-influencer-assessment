@@ -22,6 +22,7 @@ export type INFLUENCER_TYPE = {
   platform: string;
   trustScore: number;
   updatedAt: string;
+  influencerCategory: string;
 };
 
 export type INFLUENCER_DETAIL = {
@@ -29,7 +30,6 @@ export type INFLUENCER_DETAIL = {
   claims: CLAIMS_TYPE[];
   createdAt: string;
   followerCount: number;
-  followersCount: number;
   handle: string;
   name: string;
   platform: string;

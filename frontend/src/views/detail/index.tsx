@@ -73,7 +73,7 @@ const Detail = () => {
       return isStatusValid && isDateValid && isSearchValid;
     });
 
-    setFilteredData(filterData as any);
+    setFilteredData(filterData as CLAIMS_TYPE[]);
   };
 
   useEffect(() => {
@@ -101,8 +101,9 @@ const Detail = () => {
             <DetailCard
               title="Trust Score"
               percentage={
-                influencer?.trustScore &&
-                influencer?.trustScore?.toFixed(2) + "%"
+                influencer?.trustScore !== undefined
+                  ? influencer?.trustScore?.toFixed(2) + "%"
+                  : "0%"
               }
               description={`Based on ${
                 filteredData?.length || 0
@@ -132,8 +133,8 @@ const Detail = () => {
             <DetailCard
               title="Followers"
               percentage={
-                influencer?.followersCount &&
-                formatNumber(influencer?.followersCount || 0) + "+"
+                influencer?.followerCount &&
+                formatNumber(influencer?.followerCount || 0) + "+"
               }
               description="Total Following"
               Icon={<TrendingUpIcon className="text-primary" />}

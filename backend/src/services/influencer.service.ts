@@ -7,13 +7,33 @@ import { searchClaims } from "../utils/serf-search.util"
 import delay from "../utils/delay"
 
 // Get all influencers with pagination and sorting
-const getAllInfluencers = async (): Promise<IInfluencer[]> => {
+const getAllInfluencers = async (): Promise<any[]> => {
   try {
-    const influencers = await Influencer.find({
+    const influencers: any[] = await Influencer.find({
       trustScore: { $gt: 0 }
     }).sort({ ["trustScore"]: -1 })
 
-    return influencers
+    const verifiedClaims = await Claim.aggregate([
+      {
+        $match: {
+          verificationStatus: "Verified"
+        }
+      },
+      {
+        $group: {
+          _id: "$influencerId",
+          count: { $sum: 1 }
+        }
+      }
+    ])
+
+    // Map verified claims to influencers
+    const updatedInfluencers = influencers.map((influencer) => {
+      const claims = verifiedClaims.find((claim) => claim._id.toString() === influencer._id.toString())
+      return { ...influencer.toObject(), id: influencer._id, verifiedClaims: claims?.count || 0 }
+    })
+
+    return updatedInfluencers
   } catch (error) {
     throw new Error((error as Error).message)
   }
@@ -33,8 +53,7 @@ const getInfluencerById = async (id: string) => {
     return {
       ...influencer.toObject(),
       claimStats: claimStats?.length || 0,
-      claims: claimStats,
-      followersCount: influencer?.followerCount || 0
+      claims: claimStats
     }
   } catch (error) {
     throw new Error((error as Error).message)
@@ -125,14 +144,6 @@ const processInfluencer = async (
       claims: processedData?.map((data) => data?.claims)?.flat()
     }
 
-    // const outputFile = "response-pool.json"
-    // fs.writeFileSync(outputFile, JSON.stringify(formattedData))
-
-    // const formattedData = JSON.parse(fs.readFileSync("response-pool.json", "utf-8"))
-
-    console.clear()
-    // console.log(`FORMATTED DATA`, formattedData)
-
     const formattedClaims = formattedData?.claims?.map((claim: any) => {
       return {
         influencerId: influencer._id,
@@ -158,7 +169,7 @@ const processInfluencer = async (
     }))
 
     // Perform the bulk write operation
-    const insertedClaims = await Claim.bulkWrite(claimBulOps)
+    await Claim.bulkWrite(claimBulOps)
 
     const tResult = await Claim.aggregate([
       {
@@ -172,10 +183,6 @@ const processInfluencer = async (
       }
     ])
 
-    // const claimsCategories: string[] = Array.from(
-    //   new Set(formattedClaims.map((claim: { category: string }) => claim?.category))
-    // )
-
     const bulkOps = [formattedData.influencerCategory].map((categoryName: string) => ({
       updateOne: {
         filter: { categoryName }, // Filter by categoryName
@@ -184,7 +191,7 @@ const processInfluencer = async (
       }
     }))
 
-    const categories = await Category.bulkWrite(bulkOps)
+    await Category.bulkWrite(bulkOps)
 
     // Extract the trustScore if available
     const trustScore = tResult.length > 0 ? tResult[0].trustScore : 0
@@ -253,7 +260,6 @@ const influencersAnalytics = async () => {
         $group: {
           _id: null,
           activeInfluencers: { $sum: 1 },
-          verifiedClaims: { $sum: "$claimStats" },
           averageTrustScore: { $avg: "$trustScore" }
         }
       },
@@ -263,7 +269,31 @@ const influencersAnalytics = async () => {
         }
       }
     ])
-    return data.length ? data[0] : {}
+
+    const verifiedClaims = await Claim.aggregate([
+      {
+        $match: {
+          verificationStatus: "Verified"
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          verifiedClaims: { $sum: 1 }
+        }
+      },
+      {
+        $project: {
+          _id: 0
+        }
+      }
+    ])
+
+    return {
+      activeInfluencers: data.length ? data[0].activeInfluencers : 0,
+      averageTrustScore: data.length ? Math.floor(data[0].averageTrustScore) : 0,
+      verifiedClaims: verifiedClaims.length ? verifiedClaims[0].verifiedClaims : 0
+    }
   } catch (error) {
     throw new Error((error as Error).message)
   }
