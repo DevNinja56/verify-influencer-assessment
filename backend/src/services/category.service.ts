@@ -11,4 +11,16 @@ const getAllCategories = async (): Promise<ICategory[]> => {
   }
 }
 
-export default { getAllCategories }
+const deleteCategory = async (id: string): Promise<ICategory> => {
+  try {
+    const category = await Category.findByIdAndDelete(id)
+    if (!category) {
+      throw new Error("Category not found")
+    }
+    return category
+  } catch (error) {
+    throw new Error((error as Error).message)
+  }
+}
+
+export default { getAllCategories, deleteCategory }
