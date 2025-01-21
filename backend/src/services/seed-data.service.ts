@@ -193,7 +193,7 @@ const seedDatabase = async () => {
           handle: `@${claimData.influencer.replace(/\s+/g, "").toLowerCase()}`,
           followerCount: Math.floor(Math.random() * 10000) + 1000,
           trustScore: 0,
-          claimStats: { totalClaims: 0, verifiedClaims: 0, questionableClaims: 0, debunkedClaims: 0 }
+          claimStats: 0
         })
       }
 
@@ -206,7 +206,7 @@ const seedDatabase = async () => {
         confidenceScore: 0
       })
 
-      influencer.claimStats.totalClaims += 1
+      influencer.claimStats += 1
       await influencer.save()
     }
 

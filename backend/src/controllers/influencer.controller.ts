@@ -64,7 +64,15 @@ const addInfluencer = async (req: Request, res: Response) => {
 // Process influencer data
 const processInfluencer = async (req: Request, res: Response) => {
   try {
-    const { name, journals, notes } = req.body
+    const {
+      name,
+      journals,
+      notes,
+      includeRevenueAnalysis,
+      verifyWithScientificJournals,
+      timeRange = "All Time",
+      analyzeInfluencer = 5
+    } = req.body
 
     if (!name) {
       generalResponse(res, {
@@ -74,7 +82,15 @@ const processInfluencer = async (req: Request, res: Response) => {
       return
     }
 
-    const influencer = await InfluencerService.processInfluencer(name, journals, notes)
+    const influencer = await InfluencerService.processInfluencer(
+      name,
+      journals,
+      analyzeInfluencer,
+      timeRange,
+      notes,
+      includeRevenueAnalysis,
+      verifyWithScientificJournals
+    )
     generalResponse(res, {
       status: 200,
       message: "Influencer processed successfully",
