@@ -16,7 +16,7 @@ type Row = {
   [key: string]: unknown;
 };
 
-type Tab = {
+export type Tab = {
   label: string;
   value: string;
 };
@@ -45,7 +45,7 @@ const CustomTable: React.FC<CustomTableProps> = ({
   const [selectedTab, setSelectedTab] = React.useState<string>("all");
   const [highestFirst, setHighestFirst] = React.useState<boolean>(false);
 
-  const customizedColumns = columns.map((col) => ({
+  const customizedColumns = [...columns].map((col) => ({
     ...col,
     flex: 1,
     sortable: false,
@@ -80,7 +80,7 @@ const CustomTable: React.FC<CustomTableProps> = ({
         <Stack direction="row" gap="20px">
           {tabs &&
             tabs?.length > 0 &&
-            tabs?.map((item, index) => (
+            [{ label: "All", value: "all" }, ...tabs]?.map((item, index) => (
               <Chip
                 onClick={() => setSelectedTab(item?.value)}
                 key={"tab--" + item?.value + index}

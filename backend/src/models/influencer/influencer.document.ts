@@ -14,7 +14,8 @@ export interface IInfluencer extends Document {
   handle: string
   followerCount: number
   trustScore: number
-  claimStats: InfluencerClaimStats
+  claimStats: number
   createdAt: Date
   updatedAt: Date
+  influencerCategory: string
 }

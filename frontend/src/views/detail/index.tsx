@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Box,
   Button,
@@ -27,6 +27,7 @@ import { Dayjs } from "dayjs";
 import moment from "moment";
 import api from "../../service";
 import { useParams } from "react-router-dom";
+import { formatNumber } from "../../utils/formatNumber";
 
 const Detail = () => {
   const [selectedStatuses, setSelectedStatuses] = React.useState<string>("");
@@ -44,7 +45,7 @@ const Detail = () => {
     const response = await api.get(`/api/influencer/${id}`);
     if (response && response.status === 200) {
       setInfluencer(response?.data?.data);
-      setFilteredData(response?.data?.data?.claimStats);
+      setFilteredData(response?.data?.data?.claims);
       setLoading(false);
     } else {
       setLoading(false);
@@ -56,7 +57,7 @@ const Detail = () => {
   }, []);
 
   const handleFilterData = () => {
-    const filterData = influencer?.claimStats?.filter((item) => {
+    const filterData = influencer?.claims?.filter((item) => {
       const matchesStatus = item?.verificationStatus === selectedStatuses;
       const matchesDate =
         moment(item?.createdAt).format("l") ===
@@ -74,6 +75,10 @@ const Detail = () => {
 
     setFilteredData(filterData as any);
   };
+
+  useEffect(() => {
+    handleFilterData();
+  }, [selectedStatuses, selectedDate, searchVal]);
 
   return loading ? (
     <Box display="flex" justifyContent="center" alignItems="center">
@@ -96,16 +101,21 @@ const Detail = () => {
             <DetailCard
               title="Trust Score"
               percentage={
-                influencer?.trustScore && influencer?.trustScore + "%"
+                influencer?.trustScore &&
+                influencer?.trustScore?.toFixed(2) + "%"
               }
-              description="Based on 127 verified claims"
+              description={`Based on ${
+                filteredData?.length || 0
+              } verified claims`}
               Icon={<TrendingUpIcon className="text-primary" />}
             />
           </Grid>
           <Grid item xs={2.8}>
             <DetailCard
               title="Yearly Revenue"
-              percentage={"--"}
+              percentage={`$ ${
+                formatNumber(influencer?.yearlyRevenue || 0) || "--"
+              }`}
               description="Estimated earning"
               Icon={<AttachMoneyIcon className="text-primary" />}
             />
@@ -113,8 +123,8 @@ const Detail = () => {
           <Grid item xs={2.8}>
             <DetailCard
               title="Products"
-              percentage={"--"}
-              description="Recommended products"
+              percentage={`${formatNumber(influencer?.products || 0) || "--"}`}
+              description="Products"
               Icon={<LocalMallOutlinedIcon className="text-primary" />}
             />
           </Grid>
@@ -122,7 +132,8 @@ const Detail = () => {
             <DetailCard
               title="Followers"
               percentage={
-                influencer?.followersCount && influencer?.followersCount + "+"
+                influencer?.followersCount &&
+                formatNumber(influencer?.followersCount || 0) + "+"
               }
               description="Total Following"
               Icon={<TrendingUpIcon className="text-primary" />}
@@ -246,6 +257,29 @@ const Detail = () => {
                 >
                   Active Filters:
                 </Typography>
+
+                <div className="flex gap-2">
+                  {selectedStatuses && (
+                    <div className="flex items-center bg-gray-700 text-white py-1 px-3 m-1 rounded-full shadow-md">
+                      <span>Status: {selectedStatuses}</span>
+                    </div>
+                  )}
+
+                  {selectedDate && (
+                    <div className="flex items-center bg-gray-700 text-white py-1 px-3 m-1 rounded-full shadow-md">
+                      <span>
+                        Publish Date:{" "}
+                        {moment(selectedDate?.toDate()).format("l")}
+                      </span>
+                    </div>
+                  )}
+
+                  {searchVal && (
+                    <div className="flex items-center bg-gray-700 text-white py-1 px-3 m-1 rounded-full shadow-md">
+                      <span>Search: {searchVal}</span>
+                    </div>
+                  )}
+                </div>
               </Stack>
             </Stack>
           </Box>

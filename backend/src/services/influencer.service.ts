@@ -1,9 +1,10 @@
 import Influencer from "../models/influencer/influencer.model"
 import Claim from "../models/claim/claim.model"
+import Category from "../models/category/category.model"
 import { IInfluencer } from "../models/influencer/influencer.document"
-import { VerificationStatus } from "../models/claim/claim.document"
 import { getOpenAIResponse } from "../utils/open-ai-client.util"
-import { calculateInfluencerTrustScore } from "../utils/helper-functions.util"
+import { searchClaims } from "../utils/serf-search.util"
+import delay from "../utils/delay"
 
 // Get all influencers with pagination and sorting
 const getAllInfluencers = async (): Promise<IInfluencer[]> => {
@@ -27,26 +28,13 @@ const getInfluencerById = async (id: string) => {
     }
 
     // Get claims statistics
-    const claimStats = await Claim.aggregate([
-      {
-        $match: { influencerId: influencer._id }
-      },
-      {
-        $project: {
-          content: 1,
-          category: 1,
-          verificationStatus: 1,
-          confidenceScore: 1,
-          _id: 1,
-          createdAt: 1
-        }
-      }
-    ])
+    const claimStats = await Claim.find({ influencerId: influencer._id })
 
     return {
       ...influencer.toObject(),
-      claimStats,
-      followersCount: influencer.followerCount
+      claimStats: claimStats?.length || 0,
+      claims: claimStats,
+      followersCount: influencer?.followerCount || 0
     }
   } catch (error) {
     throw new Error((error as Error).message)
@@ -65,127 +53,160 @@ const addInfluencer = async (data: { name: string; platform: string; handle: str
 }
 
 // Process influencer data
-const processInfluencer = async (name: string, journals: string[], notes?: string) => {
-  // Find or create the influencer
-  let influencer = await Influencer.findOneAndUpdate(
-    { name },
-    {
-      name,
-      platform: "Twitter",
-      handle: `@${name.toLowerCase().replace(/\s+/g, "")}`
-    },
-    { upsert: true, new: true }
-  )
+const processInfluencer = async (
+  name: string,
+  journals: string[],
+  analyzeInfluencer: number,
+  timeRange: string,
+  notes?: string,
+  includeRevenueAnalysis?: boolean,
+  verifyWithScientificJournals?: boolean
+) => {
+  try {
+    // Find or create the influencer
+    let influencer = await Influencer.findOneAndUpdate(
+      { name },
+      {
+        name,
+        platform: "Twitter",
+        handle: `@${name.toLowerCase().replace(/\s+/g, "")}`
+      },
+      { upsert: true, new: true }
+    )
 
-  // Fetch all claims associated with the influencer
-  const claims = await Claim.find({ influencerId: influencer._id })
+    const searchResults = await searchClaims(name, analyzeInfluencer, timeRange, verifyWithScientificJournals)
 
-  const influencerClaims = claims.map((claim) => {
-    return {
-      content: claim.content,
-      verificationStatus: claim.verificationStatus
-    }
-  })
+    const batchSize = 5
+    const processedData = []
 
-  // Verif cliams using OpenAI
-  const prompt = `
-        You are a fact-checking and claim verification expert. 
-        I will provide you with an influencer and their claims. Your task is to:
-        1. ${
-          journals && journals?.length > 0
-            ? `Verify each claim by referring to these journals only ${journals.map((j) => `"${j}"`).join(",")}`
-            : "Verify each claim by referring to credible sources or journals."
+    for (let i = 0; i < searchResults.length; i += batchSize) {
+      const batch = searchResults.slice(i, i + batchSize)
+
+      // Calculate a random delay between 1-3 seconds (1000 to 3000 ms) for each batch
+      const randomDelay = Math.floor(Math.random() * 2000) + 1000
+
+      // console.log(`Batch ${i} TO ${i + batchSize} PROCESSING DELAY ${randomDelay} ms`)
+      await delay(randomDelay)
+      // console.log(`Batch ${i} TO ${i + batchSize} STARTED`)
+
+      try {
+        const response = await getOpenAIResponse(
+          batch,
+          name,
+          analyzeInfluencer,
+          timeRange,
+          journals,
+          notes,
+          includeRevenueAnalysis,
+          verifyWithScientificJournals
+        )
+
+        if (response) {
+          processedData.push(response)
+        } else {
+          console.error("Failed to analyze claims.")
         }
-        2. Provide a verification status for each claim, which can be one of the following: "Verified", "Questionable", or "Debunked".
-        3. Assign a trust score between 0 and 100, where 100 means highly trustworthy and 0 means not trustworthy.
-        ${notes ? `4. Please do the research using these notes in context: "${notes}"` : " "}
+      } catch (error) {
+        console.log(error)
+      }
+    }
 
-        Here is the influencer and their claims:
-        ${JSON.stringify({ influencer, influencerClaims })}
+    const firstBatchData = processedData[0]
 
-        The claims text is in the "content" key.
+    const formattedData = {
+      influencer: firstBatchData?.influencer,
+      influencerCategory: firstBatchData?.influencerCategory,
+      timeRange: firstBatchData?.timeRange,
+      summary: firstBatchData?.summary,
+      followers: firstBatchData?.followers,
+      yearlyRevenue: firstBatchData?.yearlyRevenue,
+      recommendedProducts: [],
+      revenueAnalysis: firstBatchData?.revenueAnalysis,
+      claims: processedData?.map((data) => data?.claims)?.flat()
+    }
 
-        Return the result **only** in this JSON format:
-        {
-          "claims": [
-            {
-              "content": "The claim content here.",
-              "verificationStatus": "verified/questionable/debunked",
-              "trustScore": 85
-            },
-            ...
-          ]
+    // const outputFile = "response-pool.json"
+    // fs.writeFileSync(outputFile, JSON.stringify(formattedData))
+
+    // const formattedData = JSON.parse(fs.readFileSync("response-pool.json", "utf-8"))
+
+    console.clear()
+    // console.log(`FORMATTED DATA`, formattedData)
+
+    const formattedClaims = formattedData?.claims?.map((claim: any) => {
+      return {
+        influencerId: influencer._id,
+        content: claim?.content || ``,
+        category: claim?.category || ``,
+        platform: claim?.source || ``, // source
+        verificationStatus: claim?.verificationStatus || ``,
+        confidenceScore: claim?.trustScore, // trustScore
+        source: claim?.source?.url || ``
+      }
+    })
+
+    // Prepare bulk write operations to avoid duplicates
+    const claimBulOps = formattedClaims.map((claim: any) => ({
+      updateOne: {
+        filter: {
+          influencerId: claim.influencerId,
+          content: claim.content
+        },
+        update: { $setOnInsert: claim }, // Insert only if the document doesn't exist
+        upsert: true // If the document doesn't exist, insert it
+      }
+    }))
+
+    // Perform the bulk write operation
+    const insertedClaims = await Claim.bulkWrite(claimBulOps)
+
+    const tResult = await Claim.aggregate([
+      {
+        $match: { influencerId: influencer._id } // Match claims by influencerId
+      },
+      {
+        $group: {
+          _id: null,
+          trustScore: { $avg: "$confidenceScore" } // Calculate average confidenceScore
         }
-        Make sure the response is valid JSON and contains no additional text or explanation.
-      `
+      }
+    ])
 
-  const verifiedClaims = await getOpenAIResponse(prompt)
-  const parsedResponse = JSON.parse(verifiedClaims || "{}")
+    // const claimsCategories: string[] = Array.from(
+    //   new Set(formattedClaims.map((claim: { category: string }) => claim?.category))
+    // )
 
-  // Initialize stats
-  const stats = {
-    totalClaims: claims.length,
-    verifiedClaims: 0,
-    questionableClaims: 0,
-    debunkedClaims: 0
+    const bulkOps = [formattedData.influencerCategory].map((categoryName: string) => ({
+      updateOne: {
+        filter: { categoryName }, // Filter by categoryName
+        update: { $set: { categoryName } }, // Set the categoryName field
+        upsert: true // If the category doesn't exist, insert it
+      }
+    }))
+
+    const categories = await Category.bulkWrite(bulkOps)
+
+    // Extract the trustScore if available
+    const trustScore = tResult.length > 0 ? tResult[0].trustScore : 0
+
+    await Influencer.findOneAndUpdate(
+      { _id: influencer._id },
+      {
+        followerCount: formattedData?.followers?.total || 0,
+        yearlyRevenue: formattedData?.yearlyRevenue?.total || 0,
+        products: formattedData?.yearlyRevenue?.breakdown?.products || 0,
+        trustScore,
+        influencerCategory: influencer?.influencerCategory || formattedData?.influencerCategory || ``
+      }
+    )
+
+    // console.log(`INSERTED Claims ${insertedClaims.insertedCount}`, JSON.stringify(insertedClaims))
+
+    return influencer
+  } catch (error) {
+    console.log(error)
+    return null
   }
-
-  // Calcualte Score Using Weighted Average with Exponential Decay for Debunked Claims
-  const trustScore = calculateInfluencerTrustScore(parsedResponse?.claims)
-
-  // map id of that claim
-  const idMappedClaims = parsedResponse?.claims.map((claim: any) => {
-    let claimId
-    const claimFound: any = claims.find((c) => c.content?.trim() === claim.content?.trim())
-    if (claimFound) {
-      claimId = claimFound._id.toString()
-    }
-
-    return {
-      ...claim,
-      confidenceScore: claim.trustScore,
-      id: claimId
-    }
-  })
-
-  // Update claims
-  if (idMappedClaims && idMappedClaims.length > 0) {
-    const bulkOperations = idMappedClaims
-      .filter((claim: any) => claim.id) // Ensure only claims with an ID are processed
-      .map((claim: any) => ({
-        updateOne: {
-          filter: { _id: claim.id },
-          update: {
-            verificationStatus: claim.verificationStatus,
-            confidenceScore: claim.confidenceScore
-          }
-        }
-      }))
-
-    if (bulkOperations.length > 0) {
-      await Claim.bulkWrite(bulkOperations)
-    }
-  }
-
-  console.log("+++", idMappedClaims, "+++")
-
-  // Process each claim
-  for (const claim of parsedResponse?.claims) {
-    if (claim.verificationStatus === VerificationStatus.Verified) {
-      stats.verifiedClaims++
-    } else if (claim.verificationStatus === VerificationStatus.Questionable) {
-      stats.questionableClaims++
-    } else if (claim.verificationStatus === VerificationStatus.Debunked) {
-      stats.debunkedClaims++
-    }
-  }
-
-  // Update influencer stats
-  influencer.trustScore = Math.floor(trustScore)
-  influencer.claimStats = stats
-  await influencer.save()
-
-  return influencer
 }
 
 // Get all influencers name
@@ -232,7 +253,7 @@ const influencersAnalytics = async () => {
         $group: {
           _id: null,
           activeInfluencers: { $sum: 1 },
-          verifiedClaims: { $sum: "$claimStats.verifiedClaims" },
+          verifiedClaims: { $sum: "$claimStats" },
           averageTrustScore: { $avg: "$trustScore" }
         }
       },
